@@ -8,8 +8,8 @@ export default class Character {
 
     constructor(posX, posY, clr) {
 
-        this.width = 30;
-        this.height = 40;
+        this.width = 25;
+        this.height = 35;
 
         this.collider = new Collider(this); // Creates the collision handler
 
@@ -165,28 +165,37 @@ export default class Character {
         } return false;              	// Return false if there was no collision.
 
       }
-	collidePlatformLeft (tile_left) {
+	collidePlatformLeft (tile_left,tile_top) {
 
 		// Checks if character is intersecting with the wall from the left
 		if (this.getRight() > tile_left && this.getPreviousRight() <= tile_left) {
 
-			this.setRight(tile_left - 0.01);	// -0.01 is to fix a small problem
-		  	this.vel.x = 0;
-		  	this.acc.x = 0;
-		  	return true;
+            if(this.getBottom() > tile_top){
+
+    			this.setRight(tile_left - 0.01);	// -0.01 is to fix a small problem
+    		  	this.vel.x = 0;
+    		  	this.acc.x = 0;
+    		  	return true;
+            }
 
 		} return false;
 
 	}
-	collidePlatformRight (tile_right) {
+	collidePlatformRight (tile_right, tile_top) {
 
 		// Checks if character is intersecting with the wall from the right
 		if (this.getLeft() < tile_right && this.getPreviousLeft() >= tile_right) {
 
-			this.setLeft(tile_right);
-			this.vel.x = 0;
-			this.acc.x = 0;
-			return true;
+            if(this.getBottom() > tile_top){
+
+                this.setLeft(tile_right);
+                this.vel.x = 0;
+                this.acc.x = 0;
+                return true;
+
+            }
+
+			
 
 		} return false;
 
