@@ -6,18 +6,21 @@ var Friction = -0.09;
 
 export default class Character {
 
-    constructor(posX, posY, clr) {
+    constructor(posX, posY, el, mapOffset) {
 
         this.width = 25;
         this.height = 35;
 
-        this.collider = new Collider(this); // Creates the collision handler
-
-        this.color = clr
-
+        this.mapOffset = mapOffset;
+        
         this.pos = {        		// Character position
             x: posX,
             y: posY
+        };
+
+        this.centerPos = {                // Character center point position
+            x: posX + this.width/2,
+            y: posY + this.height/2
         };
 
         this.previousPos = {        // Character previous position, used for checking
@@ -25,19 +28,28 @@ export default class Character {
             y: posY					// with the walls
         };
 
-        this.acc = {        // Character acceleration
+        this.acc = {                // Character acceleration
+            x: 0,
+            y: 0
+        };
+        this.vel = {                // Character velocity
             x: 0,
             y: 0
         };
 
-        this.vel = {        // Character velocity
-            x: 0,
-            y: 0
-        };
+        this.element = el;          // Character element, 1 for fire, 2 for water
+        switch(this.element){
+            case 1: this.color = "#e6350e"; break;
+            case 2: this.color = "#22bce3"; break
+        }
+
+        this.collider = new Collider(this, mapOffset); // Creates the collision handler
 
         this.jumping = false;
         this.movingLeft = false;
         this.movingRight = false;
+
+        this.score = 0;
 
     }
 
@@ -67,12 +79,16 @@ export default class Character {
         this.pos.x += this.vel.x / dt*10;
         this.pos.y += this.vel.y / dt*10;
 
+        // Updates center position
+        this.centerPos.x =  this.pos.x + this.width/2;
+        this.centerPos.y =  this.pos.y + this.height/2;
+        
+
     }
 
 
     // Function for drawing the character on screen //////////////////////////
     draw(ctx) {				
-
     	ctx.fillStyle = this.color;
         ctx.fillRect(this.pos.x, this.pos.y, this.width, this.height);
     }
@@ -85,6 +101,11 @@ export default class Character {
     		this.jumping = true;
     		this.vel.y = -12;
     	}
+    }
+
+    collectCoin(){
+        this.score++;
+        console.log("Score: " + this.score);
     }
 
 
@@ -108,56 +129,61 @@ export default class Character {
 
     // Get side positions ///////////////
     getTop(){
-    	return this.pos.y;
+    	return this.pos.y-this.mapOffset.y;
     }
     getBottom(){
-    	return this.pos.y + this.height;
+    	return this.pos.y + this.height -this.mapOffset.y;
     }
     getLeft(){
-    	return this.pos.x;
+    	return this.pos.x -this.mapOffset.x;
     }
     getRight(){
-    	return this.pos.x + this.width;
+    	return this.pos.x + this.width -this.mapOffset.x;
+    }
+    getCenterPos(){
+        let cp =   {x: this.centerPos.x -this.mapOffset.x, 
+                    y: this.centerPos.y -this.mapOffset.y};
+        return cp;
     }
 
 
     // Get previous side positions //////////////////
     getPreviousTop(){
-    	return this.previousPos.y;
+    	return this.previousPos.y-this.mapOffset.y;
     }
     getPreviousBottom(){
-    	return this.previousPos.y + this.height;
+    	return this.previousPos.y + this.height -this.mapOffset.y;
     }
     getPreviousLeft(){
-    	return this.previousPos.x;
+    	return this.previousPos.x-this.mapOffset.x;
     }
     getPreviousRight(){
-    	return this.previousPos.x + this.width;
+    	return this.previousPos.x + this.width -this.mapOffset.x;
     }
 
 
     // Set positions through sides /////////////////
     setTop(newY){
-    	this.pos.y = newY;
+    	this.pos.y = newY +this.mapOffset.y;
     }
     setBottom(newY){
-    	this.pos.y = newY - this.height;
+    	this.pos.y = newY - this.height +this.mapOffset.y;
     }
     setLeft(newX){
-    	this.pos.x = newX;
+    	this.pos.x = newX +this.mapOffset.x;
     }
     setRight(newX){
-    	this.pos.x = newX - this.width;
+    	this.pos.x = newX - this.width +this.mapOffset.x;
     }
 
 
     // Functions for making the character move accordingly with the collision ///////////////////////////
     collidePlatformBottom (tile_bottom) {
 
-    	// Checks if character is intersecting with the wall from below
+    	// Checks if character is intersecting with the bottom side of the wall
         if (this.getTop() < tile_bottom && this.getPreviousTop() >= tile_bottom) {
 
-		    this.setTop(tile_bottom);	// Move the top of the object to the bottom of the tile.
+		    this.setTop(tile_bottom);	// Move the top of the character to the bottom of the wall.
 		    this.vel.y = 0;     		// Stop moving in that direction.
 		    this.acc.y = 0;  
 		    return true;               	// Return true because there was a collision.
@@ -167,7 +193,7 @@ export default class Character {
       }
 	collidePlatformLeft (tile_left,tile_top) {
 
-		// Checks if character is intersecting with the wall from the left
+		// Checks if character is intersecting with the left side of the wall
 		if (this.getRight() > tile_left && this.getPreviousRight() <= tile_left) {
 
             if(this.getBottom() > tile_top){
@@ -183,7 +209,7 @@ export default class Character {
 	}
 	collidePlatformRight (tile_right, tile_top) {
 
-		// Checks if character is intersecting with the wall from the right
+		// Checks if character is intersecting with the right side of the wall
 		if (this.getLeft() < tile_right && this.getPreviousLeft() >= tile_right) {
 
             if(this.getBottom() > tile_top){
@@ -192,17 +218,13 @@ export default class Character {
                 this.vel.x = 0;
                 this.acc.x = 0;
                 return true;
-
             }
-
-			
-
 		} return false;
 
 	}
 	collidePlatformTop(tile_top) {
 
-		// Checks if character is intersecting with the wall from above
+		// Checks if character is intersecting with the upper side of the wall
 		if (this.getBottom() > tile_top && this.getPreviousBottom() <= tile_top) {
 
 			this.setBottom(tile_top - 0.01);
@@ -214,5 +236,40 @@ export default class Character {
 		} return false;
 
 	}
+
+    // Function for making the character interact accordingly with the liquid type /////
+    collideLiquid(tile_top, liquidType) {                                                       // Liquide types: 1. Lava || 2. Water
+
+        // Checks if character is intersecting with the liquid (from above)
+        if (this.getBottom() > tile_top+5 && this.getPreviousBottom() <= tile_top+5) {
+
+            if(liquidType != this.element){
+                window.location.reload(true);
+            }
+            return true;
+
+        } return false;
+
+    }
+
+    // Function for checking the collision with the coins, using the center point ////////////////
+    collideCoin(element, coin_top, coin_bottom, coin_left, coin_right){
+
+        if(element == this.element){
+
+            if (this.getCenterPos().y  < coin_bottom  && this.getCenterPos().y > coin_top ) {
+
+                if (this.getCenterPos().x < coin_right  && this.getCenterPos().x > coin_left ) {
+
+                    this.collectCoin();
+                    return true;
+
+                } return false;
+
+
+            } return false;    
+
+        }
+    }
 
 }
