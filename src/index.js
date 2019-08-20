@@ -23,6 +23,18 @@ let collision_map= [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],        // COLLISI
                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
                     [1,1,1,1,3,3,3,1,1,1,1,1,1,4,4,4,1,1,1,1]];
 
+let graphical_map= [[99,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,99],        // COLLISION MAP ////////////////////////////////////////
+                    [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93],        // 90 - nothing                   10,11,12 - platforms
+                    [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,12,99],        // 91 - block facing down
+                    [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,12,12,99,99],        // 92 - block facing right
+                    [99,96,90,90,12,12,12,12,12,94,94,12,12,12,12,12,91,91,91,99],        // 93 - block facing left
+                    [99,99,96,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93],        // 94 - block facing up
+                    [99,91,91,12,12,12,12,12,12,12,12,12,12,12,12,12,12,90,90,93],        // 95 - block facing upLeft
+                    [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93],        // 96 - block facing upRight
+                    [92,90,90,99,10,10,10,99,90,90,90,90,99,11,11,11,99,90,95,99],        // 97 - block facing downRight
+                    [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93,99],        // 98 - block facing downLeft
+                    [99,94,94,94,11,11,11,94,94,94,94,94,94,10,10,10,94,94,99,99]];       // 99 - inner block
+
 let coin_map =     [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],        // COIN MAP /////////
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],        // 0 - nothing
@@ -49,6 +61,9 @@ let aquaGirl = new Character(2*tile_size+mapOffset.x, 9*tile_size+mapOffset.y, 2
 // Creates the controller
 let IH = new InputHandler(lavaBoy,aquaGirl);
 
+var tileSheet = new Image();
+tileSheet.src = "/img/tiles 2.png";
+
 
 // Sets Game loop /////////////////////////
 let lastTime = 0;
@@ -58,6 +73,8 @@ function loop (currentTime){               // Function called passing the curren
 
     // Clears screen, before updating it
     ctx.clearRect(0,0,GAME_W,GAME_H);
+    ctx.fillStyle = "#36302c";
+    ctx.fillRect(0+mapOffset.x,0+mapOffset.y, collision_map[0].length*tile_size, collision_map.length*tile_size);
 
     // Updates all characters
     lavaBoy.update(deltaTime);
@@ -71,6 +88,7 @@ function loop (currentTime){               // Function called passing the curren
 
     // Draws the map
     drawMap(collision_map);
+    drawGMap(graphical_map);
 
     // Draws the characters
     lavaBoy.draw(ctx);
@@ -122,7 +140,7 @@ function drawMap(map){
         for (var j = 0; j<map[i].length; j++){
             switch(map[i][j]){
 
-                case 1: 
+                /*case 1: 
                 ctx.fillStyle = "#000000" ;                                 
                 ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+mapOffset.y, tile_size,tile_size);
                 break;
@@ -130,20 +148,20 @@ function drawMap(map){
                 case 2: 
                 ctx.fillStyle = "#000000" ;                                
                 ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+(tile_size/2)+mapOffset.y, tile_size,tile_size/2);
-                break;
+                break;*/
 
                 case 3: 
                 ctx.fillStyle = "#e6350e" ;                                
-                ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+mapOffset.y, tile_size,tile_size/2);
+                ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+mapOffset.y, tile_size,tile_size/2+10);
                 ctx.fillStyle = "#000000" ;                                
-                ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+(tile_size/2)+mapOffset.y, tile_size,tile_size/2);
+                //ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+(tile_size/2)+mapOffset.y, tile_size,tile_size/2);
                 break;
 
                 case 4: 
                 ctx.fillStyle = "#22bce3" ;                                
-                ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+mapOffset.y, tile_size,tile_size/2);
+                ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+mapOffset.y, tile_size,tile_size/2+10);
                 ctx.fillStyle = "#000000" ;                                
-                ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+(tile_size/2)+mapOffset.y, tile_size,tile_size/2);
+                //ctx.fillRect(j*tile_size+mapOffset.x, i*tile_size+(tile_size/2)+mapOffset.y, tile_size,tile_size/2);
                 break;
             }
         }
@@ -163,6 +181,64 @@ function drawMap(map){
         ctx.fillRect(j*tile_size+mapOffset.x,0+mapOffset.y,1,720);
             
     }*/
+
+}
+
+function drawGMap(map){
+
+    for (var i = 0; i<map.length; i++){
+        for (var j = 0; j<map[i].length; j++){
+            switch(map[i][j]){
+
+                case 91: 
+                ctx.drawImage(tileSheet,40,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 92:  
+                ctx.drawImage(tileSheet,80,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 93: 
+                ctx.drawImage(tileSheet,0,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 94: 
+                ctx.drawImage(tileSheet,40,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 95: 
+                ctx.drawImage(tileSheet,0,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 96: 
+                ctx.drawImage(tileSheet,80,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 97: 
+                ctx.drawImage(tileSheet,80,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 98: 
+                ctx.drawImage(tileSheet,0,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 99: 
+                ctx.drawImage(tileSheet,40,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                break;
+
+                case 10: 
+                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,40,20);
+                break;
+                case 11: 
+                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,40,20);
+                break;
+                case 12: 
+                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,40,20);
+                break;
+            }
+        }
+    }
+
 
 }
 
