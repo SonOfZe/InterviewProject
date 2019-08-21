@@ -1,15 +1,21 @@
 //import * as stg from '/src/settings.js';
 import Collider from '/src/collider.js' ;
+import Animator from '/src/animator.js' ;
 
 var Gravity = 0.5;
-var Friction = -0.09;
+var Friction = -0.15;
+
+const idle_r = 0;
+const idle_l = 1;
+const run_r = 2;
+const run_l = 3;
 
 export default class Character {
 
     constructor(posX, posY, el, mapOffset) {
 
-        this.width = 25;
-        this.height = 35;
+        this.width = 24;
+        this.height = 34;
 
         this.mapOffset = mapOffset;
         
@@ -36,14 +42,27 @@ export default class Character {
             x: 0,
             y: 0
         };
+                                                        // Animation list /////////////
+        this.animationList =   [[0,0,24,34,10,4],       // 0 - idle right
+                                [0,34,24,34,10,4],      // 1 - idle left
+                                [0,68,24,34,7,4],      // 2 - Run right
+                                [0,102,24,34,7,4]];    // 3 - Run left
+
+
 
         this.element = el;          // Character element, 1 for fire, 2 for water
         switch(this.element){
-            case 1: this.color = "#e6350e"; break;
-            case 2: this.color = "#22bce3"; break
+            case 1: 
+            this.color = "#e6350e"; 
+            this.animator = new Animator("/img/Lavaboy sheet.png", this.animationList);
+            break;
+            case 2: this.color = "#22bce3";
+            this.animator = new Animator("/img/Aquagirl sheet.png", this.animationList);
+            break;
         }
 
         this.collider = new Collider(this, mapOffset); // Creates the collision handler
+        
 
         this.jumping = false;
         this.movingLeft = false;
@@ -89,8 +108,10 @@ export default class Character {
 
     // Function for drawing the character on screen //////////////////////////
     draw(ctx) {				
-    	ctx.fillStyle = this.color;
-        ctx.fillRect(this.pos.x, this.pos.y, this.width, this.height);
+    	/*ctx.fillStyle = this.color;
+        ctx.fillRect(this.pos.x, this.pos.y, this.width, this.height);*/
+        this.animator.animate(ctx, this.pos.x, this.pos.y);
+
     }
 
 
@@ -111,17 +132,27 @@ export default class Character {
 
     // Movement functions //////////////////////
     moveRight(){
+
+        this.animator.setAnimation(run_r);
+
     	this.movingRight = true;
     	this.movingLeft = false;
     }
     moveLeft(){
+
+        this.animator.setAnimation(run_l);
+
     	this.movingLeft = true;
     	this.movingRight = false;
     }
     stop(){
+
+        this.animator.setAnimation((this.movingRight) ? idle_r : idle_l);
+
     	this.movingLeft = false;
     	this.movingRight = false;
     }
+
     getCollider(){
     	return this.collider;
     }

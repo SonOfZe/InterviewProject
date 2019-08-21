@@ -7,9 +7,7 @@ import InputHandler from '/src/input handler.js' ;
 let canvas = document.getElementById("Screen");
 let ctx = canvas.getContext("2d");
 
-// Canvas dimensions
-const GAME_W = canvas.width;
-const GAME_H = canvas.height;
+
 
 let collision_map= [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],        // COLLISION MAP /////////
                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],        // 0 - nothing
@@ -21,7 +19,8 @@ let collision_map= [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],        // COLLISI
                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
                     [1,0,0,1,4,4,4,1,0,0,0,0,1,3,3,3,1,0,1,1],
                     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-                    [1,1,1,1,3,3,3,1,1,1,1,1,1,4,4,4,1,1,1,1]];
+                    [1,1,1,1,3,3,3,1,1,1,1,1,1,4,4,4,1,1,1,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]];
 
 let graphical_map= [[99,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,99],        // COLLISION MAP ////////////////////////////////////////
                     [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93],        // 90 - nothing                   10,11,12 - platforms
@@ -33,7 +32,8 @@ let graphical_map= [[99,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,99
                     [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93],        // 96 - block facing upRight
                     [92,90,90,99,10,10,10,99,90,90,90,90,99,11,11,11,99,90,95,99],        // 97 - block facing downRight
                     [92,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,93,99],        // 98 - block facing downLeft
-                    [99,94,94,94,11,11,11,94,94,94,94,94,94,10,10,10,94,94,99,99]];       // 99 - inner block
+                    [99,94,94,94,11,11,11,94,94,94,94,94,94,10,10,10,94,94,99,99],
+                    [99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99]];       // 99 - inner block
 
 let coin_map =     [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],        // COIN MAP /////////
@@ -42,17 +42,28 @@ let coin_map =     [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],        // 2 - Water coin
                     [0,0,0,0,0,0,2,0,1,0,0,0,0,2,0,1,0,0,0,0],        
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],        
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0],
+                    [0,0,0,0,2,2,2,0,0,0,0,0,0,1,1,1,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,0],
+                    [0,0,0,0,1,1,1,0,0,0,0,0,0,2,2,2,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
 
 var tile_size = 40;     // Each index on the map represents a square with a side of tile_size px
 var coin_size = 16;
 
+
+canvas.width  = collision_map[0].length*tile_size;
+canvas.height = collision_map.length*tile_size;
+
+// Canvas dimensions
+const GAME_W = canvas.width;
+const GAME_H = canvas.height;
+
+
 // Game maps offset
 const mapOffset = { x: (GAME_W/2) - ((collision_map[0].length*tile_size)/2),    // This offset is used to make the map always centered on canvas
                     y: (GAME_H/2) - ((collision_map.length*tile_size)/2)};
+
 
 // Instantiates the 2 characters
 let lavaBoy = new Character(1*tile_size+mapOffset.x, 9*tile_size+mapOffset.y, 1, mapOffset);
@@ -191,54 +202,58 @@ function drawGMap(map){
             switch(map[i][j]){
 
                 case 91: 
-                ctx.drawImage(tileSheet,40,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,40,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 92:  
-                ctx.drawImage(tileSheet,80,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,80,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 93: 
-                ctx.drawImage(tileSheet,0,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,0,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 94: 
-                ctx.drawImage(tileSheet,40,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,40,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 95: 
-                ctx.drawImage(tileSheet,0,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,0,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 96: 
-                ctx.drawImage(tileSheet,80,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,80,0,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 97: 
-                ctx.drawImage(tileSheet,80,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,80,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 98: 
-                ctx.drawImage(tileSheet,0,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,0,80,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 99: 
-                ctx.drawImage(tileSheet,40,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,40,40);
+                ctx.drawImage(tileSheet,40,40,40,40,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y,tile_size,tile_size);
                 break;
 
                 case 10: 
-                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,40,20);
+                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,tile_size,tile_size/2);
                 break;
                 case 11: 
-                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,40,20);
+                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,tile_size,tile_size/2);
                 break;
                 case 12: 
-                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,40,20);
+                ctx.drawImage(tileSheet,40,0,40,20,j*tile_size+mapOffset.x,i*tile_size+mapOffset.y+tile_size/2,tile_size,tile_size/2);
                 break;
             }
         }
     }
+}
 
+function getCanvasWidth(){
+
+    return collision_map[0].length*tile_size;
 
 }
 
