@@ -8,12 +8,14 @@ export default class Animator {
 		this.animationList = animList;
 		this.currentAnim = 0;
 
+		this.lastTime = 0;
 		this.count = 0;
+
 		this.currentFrame = 0;
 
 	}
 
-	animate(ctx, posX, posY){
+	animate(ct,ctx, posX, posY){
 
 		// Draws the current frame of the current animation using the properties from the animation list, cutting the spritesheet image accordingly
 		ctx.drawImage  (this.spritesheet,
@@ -26,18 +28,26 @@ export default class Animator {
 						posX,posY,
 						this.animationList[this.currentAnim][2], this.animationList[this.currentAnim][3]);
 
-		this.updateFrame();
+		this.updateFrame(ct);
 	}
 
-	updateFrame(){
+	updateFrame(ct){  						// gets the current time from the game loop
 
-		this.count ++; // counts the iterations
+		if(!ct) return;							// if there's none, return
 
-		// Checks if enough iterations have passed, then adds+1 to current frame, if its on the last frame, sets back to first
+		ct = ct/1000;							// divides by 1000 to get seconds
+
+		let deltaTime = ct - this.lastTime;		// Calculates time passed
+		this.lastTime = ct;
+
+		this.count += deltaTime;				// Sums time counter
+
+		// Checks if enough time has passed
 		if (this.count >= this.animationList[this.currentAnim][4]){
 
-			this.count = 0;
-			this.currentFrame = (this.currentFrame == this.animationList[this.currentAnim][5]-1) ? 0 : this.currentFrame+1;
+			this.count = 0;		// sets counter back to 0
+
+			this.currentFrame = (this.currentFrame == this.animationList[this.currentAnim][5]-1) ? 0 : this.currentFrame+1;		// Adds+1 to current frame, if it is on the last frame, sets back to first
 		}
 	}
 

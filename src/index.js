@@ -102,8 +102,8 @@ function loop (currentTime){               // Function called passing the curren
     drawGMap(graphical_map);
 
     // Draws the characters
-    lavaBoy.draw(ctx);
-    aquaGirl.draw(ctx);
+    lavaBoy.draw(ctx,currentTime);
+    aquaGirl.draw(ctx,currentTime);
 
     // Draws the coins
     drawCoins(coin_map);
@@ -144,7 +144,7 @@ function drawCoins(map){
 
 }
 
-// Function for drawing the map ////////////////////////
+// Function for drawing collisions (and liquids), using the collision map ////////////////////////
 function drawMap(map){
 
     for (var i = 0; i<map.length; i++){
@@ -195,6 +195,8 @@ function drawMap(map){
 
 }
 
+
+// Function for drawing the tiles, using the graphical map
 function drawGMap(map){
 
     for (var i = 0; i<map.length; i++){

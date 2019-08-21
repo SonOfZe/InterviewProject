@@ -44,12 +44,13 @@ export default class Character {
         };
 
         // On the animation list, each index is an array containing the animation properties and spritesheet coordinates:
-        // [ sprite_X, sprite_Y, sprite_width, sprite_height, animation_delay, number of frames ]
-                                                        // Animation list /////////////
-        this.animationList =   [[0,0,24,34,10,4],       // 0 - idle right
-                                [0,34,24,34,10,4],      // 1 - idle left
-                                [0,68,24,34,7,4],       // 2 - Run right
-                                [0,102,24,34,7,4]];     // 3 - Run left
+        // [ sprite_X, sprite_Y, sprite_width, sprite_height, animation_delay (in seconds), number of frames ]
+
+        /*                                               // Animation list /////////////*/
+        this.animationList =   [[0,0,24,34,0.2,4],       // 0 - idle right
+                                [0,34,24,34,0.2,4],      // 1 - idle left
+                                [0,68,24,34,0.15,4],     // 2 - Run right
+                                [0,102,24,34,0.15,4]];   // 3 - Run left
 
 
 
@@ -111,11 +112,10 @@ export default class Character {
     }
 
 
-    // Function for drawing the character on screen //////////////////////////
-    draw(ctx) {				
-    	/*ctx.fillStyle = this.color;
-        ctx.fillRect(this.pos.x, this.pos.y, this.width, this.height);*/
-        this.animator.animate(ctx, this.pos.x, this.pos.y);
+    // Function for drawing the character on screen, calls animation function passing the current time //////
+    draw(ctx, ct) {				
+
+        this.animator.animate(ct, ctx, this.pos.x, this.pos.y);
 
     }
 
