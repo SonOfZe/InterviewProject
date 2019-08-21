@@ -42,11 +42,16 @@ export default class Character {
             x: 0,
             y: 0
         };
+
+        // On the animation list, each index is an array containing the animation properties and spritesheet coordinates:
+        // [ sprite_X, sprite_Y, sprite_width, sprite_height, animation_delay, number of frames ]
                                                         // Animation list /////////////
         this.animationList =   [[0,0,24,34,10,4],       // 0 - idle right
                                 [0,34,24,34,10,4],      // 1 - idle left
-                                [0,68,24,34,7,4],      // 2 - Run right
-                                [0,102,24,34,7,4]];    // 3 - Run left
+                                [0,68,24,34,7,4],       // 2 - Run right
+                                [0,102,24,34,7,4]];     // 3 - Run left
+
+
 
 
 

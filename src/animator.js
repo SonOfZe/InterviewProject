@@ -15,6 +15,7 @@ export default class Animator {
 
 	animate(ctx, posX, posY){
 
+		// Draws the current frame of the current animation using the properties from the animation list, cutting the spritesheet image accordingly
 		ctx.drawImage  (this.spritesheet,
 						this.animationList[this.currentAnim][0] + this.animationList[this.currentAnim][2]*this.currentFrame, 
 						this.animationList[this.currentAnim][1],
@@ -24,22 +25,20 @@ export default class Animator {
 
 						posX,posY,
 						this.animationList[this.currentAnim][2], this.animationList[this.currentAnim][3]);
-		this.updateFrame();
 
+		this.updateFrame();
 	}
 
 	updateFrame(){
 
-		this.count ++;
+		this.count ++; // counts the iterations
 
-
-
+		// Checks if enough iterations have passed, then adds+1 to current frame, if its on the last frame, sets back to first
 		if (this.count >= this.animationList[this.currentAnim][4]){
 
 			this.count = 0;
 			this.currentFrame = (this.currentFrame == this.animationList[this.currentAnim][5]-1) ? 0 : this.currentFrame+1;
 		}
-
 	}
 
 	setAnimation(x){
